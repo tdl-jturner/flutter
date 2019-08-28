@@ -22,7 +22,6 @@ public class FollowDaoService {
     }
     @RequestMapping(value = "/get", method= RequestMethod.POST)
     public Response<Follow> get(@RequestBody Request<Follow> request) {
-        log.error(request.toString());
         return new Response<Follow>(casquatchDao.getById(Follow.class,request.getPayload(),request.getQueryOptions()));
     }
 }
