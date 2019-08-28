@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>net.thedigitallink.flutter</groupId>
+  <artifactId>flutter-parent</artifactId>
+  <version>0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>Project Flutter</name>
+  <description></description>
+  <url>http://github.com/tdl-jturner/flutter</url>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>Josh Turner</name>
+      <email>turner.josh@gmail.com</email>
+      <organization>The Digital Link</organization>
+      <organizationUrl>http://thedigitallink.net/</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:ssh://github.com:tdl-jturner/flutter.git</connection>
+    <developerConnection>scm:git:ssh://github.com:tdl-jturner/flutter.git</developerConnection>
+    <url>https://github.com/tdl-jturner/flutter/tree/master</url>
+  </scm>
+
+  <modules>
+    <module>service-registry</module>
+    <module>user-service</module>
+    <module>user-dao</module>
+    <module>tests</module>
+  </modules>
+
+</project>
