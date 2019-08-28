@@ -37,9 +37,10 @@
   <modules>
     <module>service-registry</module>
     <module>user-dao</module>
-    <module>user-service</module>
     <module>follow-dao</module>
     <module>message-dao</module>
+    <module>user-service</module>
+    <module>follow-service</module>
     <module>integration-tests</module>
   </modules>
 
