@@ -40,7 +40,7 @@
     <module>user-service</module>
     <module>follow-dao</module>
     <module>message-dao</module>
-    <module>tests</module>
+    <module>integration-tests</module>
   </modules>
 
 </project>

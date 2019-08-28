@@ -1,21 +1,16 @@
-package net.thedigitallink.flutter.tests;
+package net.thedigitallink.flutter.integration.tests;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -38,7 +33,9 @@ import static org.junit.Assert.assertEquals;
 @Slf4j
 public class FollowDaoTests {
 
-    @Getter @Setter @NoArgsConstructor
+    @Getter @Setter
+    @NoArgsConstructor @AllArgsConstructor
+    @Builder
     static class Follow {
         private UUID follower;
         private UUID author;
@@ -96,8 +93,7 @@ public class FollowDaoTests {
     @Test
     public void testGet() throws Exception {
         Follow follow = random();
-        follow.setFollower(null);
-        ResponseEntity<Response> entity = restTemplate.postForEntity(getUri("follow-dao","/get"),createEntity(follow),Response.class);
+        ResponseEntity<Response> entity = restTemplate.postForEntity(getUri("follow-dao","/get"),createEntity(Follow.builder().follower(follow.getFollower()).build()),Response.class);
         assert(entity.getStatusCode().is2xxSuccessful());
         assertEquals(follow.getAuthor(),entity.getBody().getPayload().get(0).getAuthor());
     }
