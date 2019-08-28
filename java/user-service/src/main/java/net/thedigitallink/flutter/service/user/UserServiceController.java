@@ -4,24 +4,46 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @Slf4j
 public class UserServiceController {
+
+    @Getter @Setter
+    @Builder
+    @AllArgsConstructor @NoArgsConstructor
+    static class User {
+        private UUID id;
+        private String username;
+        private String email;
+        private Boolean enableNotifications;
+        long createdDttm;
+
+        public User(String username, String email) {
+            id=UUID.randomUUID();
+            createdDttm=new Date().getTime();
+        }
+        public String toString() {
+            try {
+                return new ObjectMapper().writeValueAsString(this);
+            } catch (JsonProcessingException e) {
+                return "Unable to render JSON.";
+            }
+        }
+        public static User fromJson(String json) throws IOException {
+            return new ObjectMapper().readValue(json,User.class);
+        }
+    }
 
     @Getter @Setter @NoArgsConstructor
     static class Request {
