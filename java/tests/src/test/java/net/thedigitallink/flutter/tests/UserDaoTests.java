@@ -3,6 +3,8 @@ package net.thedigitallink.flutter.tests;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.netflix.appinfo.InstanceInfo;
+import com.netflix.discovery.EurekaClient;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -58,7 +60,7 @@ public class UserDaoTests {
     }
 
     @Autowired
-    DiscoveryClient discoveryClient;
+    EurekaClient eurekaClient;
 
     private PodamFactory podamFactory = new PodamFactoryImpl();
     private RestTemplate restTemplate;
@@ -83,9 +85,8 @@ public class UserDaoTests {
     }
 
     private URI getUri(String service, String api) {
-        List<ServiceInstance> instanceList = discoveryClient.getInstances(service.toUpperCase());
-        ServiceInstance serviceInstance = instanceList.get((int)(instanceList.size()-1 * Math.random()));
-        return URI.create(serviceInstance.getUri()+"/"+service.toLowerCase()+api);
+        InstanceInfo instanceInfo = eurekaClient.getNextServerFromEureka(service.toUpperCase(),false);
+        return URI.create(String.format("http://%s:%s/%s%s",instanceInfo.getIPAddr(),instanceInfo.getPort(),service.toLowerCase(),api));
     }
 
     private User random() {
@@ -95,7 +96,7 @@ public class UserDaoTests {
     }
 
     @Test
-    public void testGet() throws Exception {
+    public void testGet() {
         User user = random();
         ResponseEntity<Response> entity = restTemplate.postForEntity(getUri("user-dao","/get"),createEntity(user),Response.class);
         assert(entity.getStatusCode().is2xxSuccessful());
@@ -103,7 +104,7 @@ public class UserDaoTests {
     }
 
     @Test
-    public void testSave() throws Exception {
+    public void testSave() {
         User user = random();
         ResponseEntity<Response> entity = restTemplate.postForEntity(getUri("user-dao","/save"),createEntity(user), Response.class);
         assert (entity.getStatusCode().is2xxSuccessful());

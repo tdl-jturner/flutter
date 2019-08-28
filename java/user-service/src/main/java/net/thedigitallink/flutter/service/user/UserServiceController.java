@@ -2,13 +2,13 @@ package net.thedigitallink.flutter.service.user;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.netflix.appinfo.InstanceInfo;
+import com.netflix.discovery.EurekaClient;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -37,7 +37,7 @@ public class UserServiceController {
     }
 
     @Autowired
-    private DiscoveryClient discoveryClient;
+    private EurekaClient eurekaClient;
 
     private RestTemplate restTemplate;
     private HttpHeaders httpHeaders;
@@ -61,9 +61,8 @@ public class UserServiceController {
     }
 
     private URI getUri(String service,String api) {
-        List<ServiceInstance> instanceList = discoveryClient.getInstances(service.toUpperCase());
-        ServiceInstance serviceInstance = instanceList.get((int)(instanceList.size()-1 * Math.random()));
-        return URI.create(serviceInstance.getUri()+"/"+service.toLowerCase()+api);
+        InstanceInfo instanceInfo = eurekaClient.getNextServerFromEureka(service.toUpperCase(),false);
+        return URI.create(String.format("http://%s:%s/%s%s",instanceInfo.getIPAddr(),instanceInfo.getPort(),service.toLowerCase(),api));
     }
 
     @RequestMapping(value = "/create", method= RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

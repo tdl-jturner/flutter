@@ -3,6 +3,8 @@ package net.thedigitallink.flutter.tests;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.netflix.appinfo.InstanceInfo;
+import com.netflix.discovery.EurekaClient;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -39,11 +41,11 @@ public class UserServiceTests {
         private String username;
         private String email;
         private Boolean enableNotifications;
-        long createdDttm;
+        private long createdDttm;
     }
 
     @Autowired
-    DiscoveryClient discoveryClient;
+    EurekaClient eurekaClient;
 
     private PodamFactory podamFactory = new PodamFactoryImpl();
     private RestTemplate restTemplate;
@@ -68,9 +70,8 @@ public class UserServiceTests {
     }
 
     private URI getUri(String service, String api) {
-        List<ServiceInstance> instanceList = discoveryClient.getInstances(service.toUpperCase());
-        ServiceInstance serviceInstance = instanceList.get((int)(instanceList.size()-1 * Math.random()));
-        return URI.create(serviceInstance.getUri()+"/"+service.toLowerCase()+api);
+        InstanceInfo instanceInfo = eurekaClient.getNextServerFromEureka(service.toUpperCase(),false);
+        return URI.create(String.format("http://%s:%s/%s%s",instanceInfo.getIPAddr(),instanceInfo.getPort(),service.toLowerCase(),api));
     }
 
     private User random() {
@@ -80,15 +81,15 @@ public class UserServiceTests {
     }
 
     @Test
-    public void testGet() throws Exception {
+    public void testGet() {
         User user = random();
-        ResponseEntity<User> entity = restTemplate.getForEntity(getUri("user-dao","/get")+"/"+user.getId().toString(),User.class);
+        ResponseEntity<User> entity = restTemplate.getForEntity(getUri("user-service","/get")+"/"+user.getId().toString(),User.class);
         assert(entity.getStatusCode().is2xxSuccessful());
         Assert.assertEquals(entity.getBody().getId(),user.getId());
     }
 
     @Test
-    public void testCreate() throws Exception {
+    public void testCreate() {
         User user = random();
         ResponseEntity<Void> entity = restTemplate.postForEntity(getUri("user-service","/create"),createEntity(user),Void.class);
         assert(entity.getStatusCode().is2xxSuccessful());
