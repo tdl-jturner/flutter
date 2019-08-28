@@ -39,6 +39,7 @@
     <module>user-dao</module>
     <module>user-service</module>
     <module>follow-dao</module>
+    <module>message-dao</module>
     <module>tests</module>
   </modules>
 
