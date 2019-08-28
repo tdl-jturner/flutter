@@ -36,8 +36,9 @@
 
   <modules>
     <module>service-registry</module>
-    <module>user-service</module>
     <module>user-dao</module>
+    <module>user-service</module>
+    <module>follow-dao</module>
     <module>tests</module>
   </modules>
 

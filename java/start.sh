@@ -17,6 +17,12 @@ CREATE TABLE flutter.user (
     created_dttm bigint,
    PRIMARY KEY (id)
 );
+
+CREATE TABLE flutter.follow (
+    follower uuid,
+    author uuid,
+   PRIMARY KEY (follower,author)
+);
 EOF
 mvn clean
 nohup mvn -pl service-registry spring-boot:run &
@@ -24,4 +30,6 @@ sleep $PAUSE
 nohup mvn -pl user-dao spring-boot:run &
 sleep $PAUSE
 nohup mvn -pl user-service spring-boot:run &
+sleep $PAUSE
+nohup mvn -pl follow-dao spring-boot:run &
 sleep $PAUSE
