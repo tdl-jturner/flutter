@@ -4,59 +4,22 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
-import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import net.thedigitallink.flutter.service.models.Request;
+import net.thedigitallink.flutter.service.models.Response;
+import net.thedigitallink.flutter.service.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
 import java.net.URI;
-import java.util.*;
+import java.util.Collections;
+import java.util.UUID;
 
 @RestController
 @Slf4j
 public class UserServiceController {
-
-    @Getter @Setter
-    @Builder
-    @AllArgsConstructor @NoArgsConstructor
-    static class User {
-        private UUID id;
-        private String username;
-        private String email;
-        private Boolean enableNotifications;
-        long createdDttm;
-
-        public User(String username, String email) {
-            id=UUID.randomUUID();
-            createdDttm=new Date().getTime();
-        }
-        public String toString() {
-            try {
-                return new ObjectMapper().writeValueAsString(this);
-            } catch (JsonProcessingException e) {
-                return "Unable to render JSON.";
-            }
-        }
-        public static User fromJson(String json) throws IOException {
-            return new ObjectMapper().readValue(json,User.class);
-        }
-    }
-
-    @Getter @Setter @NoArgsConstructor
-    static class Request {
-        User payload;
-        Request(User payload) {
-            this.payload=payload;
-        }
-    }
-
-    @Getter @Setter @NoArgsConstructor
-    static class Response{
-        List<User> payload = new ArrayList<>();
-    }
 
     @Autowired
     private EurekaClient eurekaClient;
@@ -73,9 +36,9 @@ public class UserServiceController {
         objectMapper = new ObjectMapper();
     }
 
-    private HttpEntity<String> createEntity(User user) {
+    private HttpEntity<String> createEntity(Object object) {
         try {
-            return new HttpEntity<>(objectMapper.writeValueAsString(new Request(user)),httpHeaders);
+            return new HttpEntity<>(objectMapper.writeValueAsString(new Request<>(object)),httpHeaders);
         } catch (JsonProcessingException e) {
             log.error("Unable to process JSON",e);
             return null;
@@ -102,7 +65,7 @@ public class UserServiceController {
     public ResponseEntity<User> getUser(@PathVariable String id) {
         try {
             ResponseEntity<Response> entity = restTemplate.postForEntity(getUri("user-dao","/get"),createEntity(User.builder().id(UUID.fromString(id)).build()), Response.class);
-            return new ResponseEntity<>(entity.getBody().payload.get(0),entity.getStatusCode());
+            return new ResponseEntity<>((User) entity.getBody().getPayload().get(0),entity.getStatusCode());
         }
         catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
