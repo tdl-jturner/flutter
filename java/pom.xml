@@ -35,12 +35,16 @@
   </scm>
 
   <modules>
+    <module>common</module>
     <module>service-registry</module>
     <module>user-dao</module>
     <module>follow-dao</module>
     <module>message-dao</module>
+    <module>timeline-dao</module>
     <module>user-service</module>
     <module>follow-service</module>
+    <module>message-service</module>
+    <module>timeline-service</module>
     <module>integration-tests</module>
   </modules>
 

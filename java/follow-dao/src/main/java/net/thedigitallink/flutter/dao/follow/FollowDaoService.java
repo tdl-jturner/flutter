@@ -18,10 +18,17 @@ public class FollowDaoService {
 
     @RequestMapping(value = "/save", method= RequestMethod.POST)
     public Response<Void> save(@RequestBody Request<Follow> request) {
-        return new Response<Void>(casquatchDao.save(Follow.class,request.getPayload(),request.getQueryOptions()), Response.Status.SUCCESS);
+        log.trace("POST | /save | {}",request.toString());
+        return new Response<>(casquatchDao.save(Follow.class,request.getPayload(),request.getQueryOptions()), Response.Status.SUCCESS);
     }
     @RequestMapping(value = "/get", method= RequestMethod.POST)
     public Response<Follow> get(@RequestBody Request<Follow> request) {
-        return new Response<Follow>(casquatchDao.getById(Follow.class,request.getPayload(),request.getQueryOptions()));
+        log.trace("POST | /get | {}",request.toString());
+        return new Response<>(casquatchDao.getById(Follow.class,request.getPayload(),request.getQueryOptions()));
+    }
+    @RequestMapping(value = "/getAll", method= RequestMethod.POST)
+    public Response<Follow> getAll(@RequestBody Request<Follow> request) {
+        log.trace("POST | /get | {}",request.toString());
+        return new Response<>(casquatchDao.getAllById(Follow.class,request.getPayload(),request.getQueryOptions()));
     }
 }

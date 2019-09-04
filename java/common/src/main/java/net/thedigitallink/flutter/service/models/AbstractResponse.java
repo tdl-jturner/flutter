@@ -10,6 +10,6 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Response<E>{
+public abstract class AbstractResponse<E>{
     List<E> payload = new ArrayList<>();
 }

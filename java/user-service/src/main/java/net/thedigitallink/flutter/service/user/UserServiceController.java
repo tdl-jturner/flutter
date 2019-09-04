@@ -1,13 +1,10 @@
 package net.thedigitallink.flutter.service.user;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
 import lombok.extern.slf4j.Slf4j;
-import net.thedigitallink.flutter.service.models.Request;
-import net.thedigitallink.flutter.service.models.Response;
 import net.thedigitallink.flutter.service.models.User;
+import net.thedigitallink.flutter.service.models.UserResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -26,23 +23,12 @@ public class UserServiceController {
 
     private RestTemplate restTemplate;
     private HttpHeaders httpHeaders;
-    private ObjectMapper objectMapper;
 
     public UserServiceController() {
         restTemplate=new RestTemplate();
         httpHeaders=new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        objectMapper = new ObjectMapper();
-    }
-
-    private HttpEntity<String> createEntity(Object object) {
-        try {
-            return new HttpEntity<>(objectMapper.writeValueAsString(new Request<>(object)),httpHeaders);
-        } catch (JsonProcessingException e) {
-            log.error("Unable to process JSON",e);
-            return null;
-        }
     }
 
     private URI getUri(String service,String api) {
@@ -52,22 +38,28 @@ public class UserServiceController {
 
     @RequestMapping(value = "/create", method= RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> createUser(@RequestBody User request) {
+        log.trace("POST | /create | {}",request.toString());
         try {
-            ResponseEntity<Response> entity = restTemplate.postForEntity(getUri("user-dao","/save"),createEntity(request), Response.class);
+            log.info("Received /create : {}",request.toString());
+            ResponseEntity<UserResponse> entity = restTemplate.postForEntity(getUri("user-dao","/save"),new HttpEntity<>(request.toRequestString(),httpHeaders), UserResponse.class);
             return new ResponseEntity<>(entity.getStatusCode());
         }
-            catch (Exception e) {
+        catch (Exception e) {
+            log.error("Exception Found",e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @RequestMapping(value = "/get/{id}", method=RequestMethod.GET)
     public ResponseEntity<User> getUser(@PathVariable String id) {
+        log.trace("GET | /get/{}",id);
         try {
-            ResponseEntity<Response> entity = restTemplate.postForEntity(getUri("user-dao","/get"),createEntity(User.builder().id(UUID.fromString(id)).build()), Response.class);
+            log.info("Received /get/{}",id);
+            ResponseEntity<UserResponse> entity = restTemplate.postForEntity(getUri("user-dao","/get"),new HttpEntity<>(User.builder().id(UUID.fromString(id)).build().toRequestString(),httpHeaders), UserResponse.class);
             return new ResponseEntity<>((User) entity.getBody().getPayload().get(0),entity.getStatusCode());
         }
         catch (Exception e) {
+            log.error("Exception Found",e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 

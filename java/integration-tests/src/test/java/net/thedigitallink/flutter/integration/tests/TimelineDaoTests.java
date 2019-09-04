@@ -4,8 +4,8 @@ package net.thedigitallink.flutter.integration.tests;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
 import lombok.extern.slf4j.Slf4j;
-import net.thedigitallink.flutter.service.models.Follow;
-import net.thedigitallink.flutter.service.models.FollowResponse;
+import net.thedigitallink.flutter.service.models.Timeline;
+import net.thedigitallink.flutter.service.models.TimelineResponse;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @Slf4j
-public class FollowDaoTests {
+public class TimelineDaoTests {
 
     @Autowired
     EurekaClient eurekaClient;
@@ -36,7 +36,7 @@ public class FollowDaoTests {
     private RestTemplate restTemplate;
     private HttpHeaders httpHeaders;
 
-    public FollowDaoTests() {
+    public TimelineDaoTests() {
         restTemplate=new RestTemplate();
         httpHeaders=new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
@@ -48,24 +48,32 @@ public class FollowDaoTests {
         return URI.create(String.format("http://%s:%s/%s%s",instanceInfo.getIPAddr(),instanceInfo.getPort(),service.toLowerCase(),api));
     }
 
-    private Follow random() {
-        Follow follow = podamFactory.manufacturePojoWithFullData(Follow.class);
-        restTemplate.postForEntity(getUri("follow-dao","/save"),new HttpEntity<>(follow.toRequestString(),httpHeaders), FollowResponse.class);
-        return follow;
+    private Timeline random() {
+        Timeline timeline = podamFactory.manufacturePojoWithFullData(Timeline.class);
+        restTemplate.postForEntity(getUri("timeline-dao","/save"),new HttpEntity<>(timeline.toRequestString(),httpHeaders), TimelineResponse.class);
+        return timeline;
     }
 
     @Test
     public void testGet() {
-        Follow follow = random();
-        ResponseEntity<FollowResponse> entity = restTemplate.postForEntity(getUri("follow-dao","/get"),new HttpEntity<>(Follow.builder().follower(follow.getFollower()).build().toRequestString(),httpHeaders),FollowResponse.class);
+        Timeline timeline = random();
+        ResponseEntity<TimelineResponse> entity = restTemplate.postForEntity(getUri("timeline-dao","/get"),new HttpEntity<>(Timeline.builder().user(timeline.getUser()).build().toRequestString(),httpHeaders),TimelineResponse.class);
         assert(entity.getStatusCode().is2xxSuccessful());
-        assertEquals(follow.getAuthor(),entity.getBody().getPayload().get(0).getAuthor());
+        assertEquals(timeline.getAuthor(),(entity.getBody().getPayload().get(0)).getAuthor());
+    }
+
+    @Test
+    public void testGetSince() {
+        Timeline timeline = random();
+        ResponseEntity<TimelineResponse> entity = restTemplate.postForEntity(getUri("timeline-dao","/get?since="+timeline.getCreatedDttm()),new HttpEntity<>(Timeline.builder().user(timeline.getUser()).author(timeline.getAuthor()).build().toRequestString(),httpHeaders),TimelineResponse.class);
+        assert(entity.getStatusCode().is2xxSuccessful());
+        assertEquals(timeline.getMessage(),(entity.getBody().getPayload().get(0)).getMessage());
     }
 
     @Test
     public void testSave() {
-        Follow follow = random();
-        ResponseEntity<FollowResponse> entity = restTemplate.postForEntity(getUri("follow-dao","/save"),new HttpEntity<>(follow.toRequestString(),httpHeaders), FollowResponse.class);
+        Timeline timeline = random();
+        ResponseEntity<TimelineResponse> entity = restTemplate.postForEntity(getUri("timeline-dao","/save"),new HttpEntity<>(timeline.toRequestString(),httpHeaders), TimelineResponse.class);
         assert (entity.getStatusCode().is2xxSuccessful());
     }
 

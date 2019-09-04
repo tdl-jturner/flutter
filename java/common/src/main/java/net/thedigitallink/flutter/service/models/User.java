@@ -13,7 +13,7 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
+public class User extends AbstractEntity{
     private UUID id;
     private String username;
     private String email;
@@ -23,15 +23,5 @@ public class User {
     public User(String username, String email) {
         id=UUID.randomUUID();
         createdDttm=new Date().getTime();
-    }
-    public String toString() {
-        try {
-            return new ObjectMapper().writeValueAsString(this);
-        } catch (JsonProcessingException e) {
-            return "Unable to render JSON.";
-        }
-    }
-    public static User fromJson(String json) throws IOException {
-        return new ObjectMapper().readValue(json,User.class);
     }
 }

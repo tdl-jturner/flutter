@@ -13,7 +13,7 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Message {
+public class Message extends AbstractEntity{
     private UUID id;
     private UUID author;
     private String message;
@@ -22,15 +22,5 @@ public class Message {
     public Message(UUID author, String message) {
         id=UUID.randomUUID();
         createdDttm=new Date().getTime();
-    }
-    public String toString() {
-        try {
-            return new ObjectMapper().writeValueAsString(this);
-        } catch (JsonProcessingException e) {
-            return "Unable to render JSON.";
-        }
-    }
-    public static Message fromJson(String json) throws IOException {
-        return new ObjectMapper().readValue(json,Message.class);
     }
 }

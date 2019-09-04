@@ -1,23 +1,17 @@
 package net.thedigitallink.flutter.integration.tests;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import net.thedigitallink.flutter.service.models.Follow;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
 import uk.co.jemos.podam.api.PodamFactory;
@@ -25,18 +19,12 @@ import uk.co.jemos.podam.api.PodamFactoryImpl;
 
 import java.net.URI;
 import java.util.Collections;
-import java.util.UUID;
+import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @Slf4j
 public class FollowServiceTests {
-
-    @Getter @Setter @NoArgsConstructor
-    static class Follow {
-        private UUID follower;
-        private UUID author;
-    }
 
     @Autowired
     EurekaClient eurekaClient;
@@ -44,23 +32,12 @@ public class FollowServiceTests {
     private PodamFactory podamFactory = new PodamFactoryImpl();
     private RestTemplate restTemplate;
     private HttpHeaders httpHeaders;
-    private ObjectMapper objectMapper;
 
     public FollowServiceTests() {
         restTemplate=new RestTemplate();
         httpHeaders=new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        objectMapper = new ObjectMapper();
-    }
-
-    private HttpEntity<String> createEntity(Follow follow) {
-        try {
-            return new HttpEntity<>(objectMapper.writeValueAsString(follow),httpHeaders);
-        } catch (JsonProcessingException e) {
-            log.error("Unable to process JSON",e);
-            return null;
-        }
     }
 
     private URI getUri(String service, String api) {
@@ -70,22 +47,22 @@ public class FollowServiceTests {
 
     private Follow random() {
         Follow follow = podamFactory.manufacturePojoWithFullData(Follow.class);
-        restTemplate.postForEntity(getUri("follow-service","/create"),createEntity(follow),Void.class);
+        restTemplate.postForEntity(getUri("follow-service","/create"),new HttpEntity<>(follow,httpHeaders),Void.class);
         return follow;
     }
 
     @Test
     public void testGet() {
         Follow follow = random();
-        ResponseEntity<Follow> entity = restTemplate.getForEntity(getUri("follow-service","/get")+"/"+follow.getFollower().toString(),Follow.class);
+        ResponseEntity<List<Follow>> entity = restTemplate.exchange( getUri("follow-service", String.format("/get/%s",follow.getFollower())), HttpMethod.GET,null, new ParameterizedTypeReference<List<Follow>>(){});
         assert(entity.getStatusCode().is2xxSuccessful());
-        Assert.assertEquals(follow.getAuthor(),entity.getBody().getAuthor());
+        Assert.assertEquals(follow.getAuthor(),entity.getBody().get(0).getAuthor());
     }
 
     @Test
     public void testCreate() {
         Follow follow = random();
-        ResponseEntity<Void> entity = restTemplate.postForEntity(getUri("follow-service","/create"),createEntity(follow),Void.class);
+        ResponseEntity<Void> entity = restTemplate.postForEntity(getUri("follow-service","/create"),new HttpEntity<>(follow,httpHeaders),Void.class);
         assert(entity.getStatusCode().is2xxSuccessful());
     }
 

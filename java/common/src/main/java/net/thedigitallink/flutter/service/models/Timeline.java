@@ -12,20 +12,9 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Timeline {
+public class Timeline extends AbstractEntity{
     private UUID user;
     private UUID author;
     private Long createdDttm;
     private UUID message;
-
-    public String toString() {
-        try {
-            return new ObjectMapper().writeValueAsString(this);
-        } catch (JsonProcessingException e) {
-            return "Unable to render JSON.";
-        }
-    }
-    public static Timeline fromJson(String json) throws IOException {
-        return new ObjectMapper().readValue(json, Timeline.class);
-    }
 }
