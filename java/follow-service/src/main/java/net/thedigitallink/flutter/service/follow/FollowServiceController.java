@@ -49,6 +49,19 @@ public class FollowServiceController {
         }
     }
 
+    @RequestMapping(value = "/delete", method= RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> deleteFollow(@RequestBody Follow request) {
+        log.trace("POST | /delete | {}",request.toString());
+        try {
+            ResponseEntity<FollowResponse> entity = restTemplate.postForEntity(getUri("follow-dao","/delete"),new HttpEntity<>(request.toRequestString(),httpHeaders), FollowResponse.class);
+            return new ResponseEntity<>(entity.getStatusCode());
+        }
+        catch (Exception e) {
+            log.trace("ERROR",e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @RequestMapping(value = "/get/{username}", method=RequestMethod.GET)
     public ResponseEntity<List<Follow>> getFollow(@PathVariable String username) {
         log.trace("GET | /get/{}",username);

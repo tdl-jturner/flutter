@@ -5,6 +5,7 @@ import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
 import lombok.extern.slf4j.Slf4j;
 import net.thedigitallink.flutter.service.models.Follow;
+import net.thedigitallink.flutter.service.models.FollowResponse;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,8 +22,8 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+import static org.junit.Assert.assertNull;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -83,6 +84,19 @@ public class FollowServiceTests {
         ResponseEntity<Boolean> entity = restTemplate.postForEntity(getUri("follow-service","/exists"),new HttpEntity<>(follow,httpHeaders),Boolean.class);
         assert(entity.getStatusCode().is2xxSuccessful());
         assertFalse(entity.getBody());
+    }
+
+    @Test
+    public void testDelete() {
+        Follow follow = random();
+        ResponseEntity<List<Follow>> checkEntityPre = restTemplate.exchange( getUri("follow-service", String.format("/get/%s",follow.getFollower())), HttpMethod.GET,null, new ParameterizedTypeReference<List<Follow>>(){});
+        assertNotNull(checkEntityPre.getBody());
+
+        ResponseEntity<Void> deleteEntity = restTemplate.postForEntity(getUri("follow-service","/delete"),new HttpEntity<>(follow,httpHeaders),Void.class);
+        assert (deleteEntity.getStatusCode().is2xxSuccessful());
+
+        ResponseEntity<List<Follow>> checkEntityPost = restTemplate.exchange( getUri("follow-service", String.format("/get/%s",follow.getFollower())), HttpMethod.GET,null, new ParameterizedTypeReference<List<Follow>>(){});
+        assertNull(checkEntityPost.getBody());
     }
 
 }

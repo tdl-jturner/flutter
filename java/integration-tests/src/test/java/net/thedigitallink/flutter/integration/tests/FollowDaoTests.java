@@ -22,7 +22,7 @@ import uk.co.jemos.podam.api.PodamFactoryImpl;
 import java.net.URI;
 import java.util.Collections;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -67,6 +67,19 @@ public class FollowDaoTests {
         Follow follow = random();
         ResponseEntity<FollowResponse> entity = restTemplate.postForEntity(getUri("follow-dao","/save"),new HttpEntity<>(follow.toRequestString(),httpHeaders), FollowResponse.class);
         assert (entity.getStatusCode().is2xxSuccessful());
+    }
+
+    @Test
+    public void testDelete() {
+        Follow follow = random();
+        ResponseEntity<FollowResponse> checkEntityPre = restTemplate.postForEntity(getUri("follow-dao","/get"),new HttpEntity<>(follow.toRequestString(),httpHeaders), FollowResponse.class);
+        assertNotNull(checkEntityPre.getBody().getPayload());
+
+        ResponseEntity<FollowResponse> deleteEntity = restTemplate.postForEntity(getUri("follow-dao","/delete"),new HttpEntity<>(follow.toRequestString(),httpHeaders), FollowResponse.class);
+        assert (deleteEntity.getStatusCode().is2xxSuccessful());
+
+        ResponseEntity<FollowResponse> checkEntityPost = restTemplate.postForEntity(getUri("follow-dao","/get"),new HttpEntity<>(follow.toRequestString(),httpHeaders), FollowResponse.class);
+        assertNull(checkEntityPost.getBody().getPayload());
     }
 
 }

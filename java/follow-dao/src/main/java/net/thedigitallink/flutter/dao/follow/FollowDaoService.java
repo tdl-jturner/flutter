@@ -21,6 +21,11 @@ public class FollowDaoService {
         log.trace("POST | /save | {}",request.toString());
         return new Response<>(casquatchDao.save(Follow.class,request.getPayload(),request.getQueryOptions()), Response.Status.SUCCESS);
     }
+    @RequestMapping(value = "/delete", method= RequestMethod.POST)
+    public Response<Void> delete(@RequestBody Request<Follow> request) {
+        log.trace("POST | /delete | {}",request.toString());
+        return new Response<>(casquatchDao.delete(Follow.class,request.getPayload(),request.getQueryOptions()), Response.Status.SUCCESS);
+    }
     @RequestMapping(value = "/get", method= RequestMethod.POST)
     public Response<Follow> get(@RequestBody Request<Follow> request) {
         log.trace("POST | /get | {}",request.toString());
