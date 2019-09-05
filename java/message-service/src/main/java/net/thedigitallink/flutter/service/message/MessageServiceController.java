@@ -12,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -60,7 +61,19 @@ public class MessageServiceController {
             log.trace("ERROR",e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
 
+    @RequestMapping(value = "/getAll/{username}", method=RequestMethod.GET)
+    public ResponseEntity<List<Message>> getAllMessagesForUser(@PathVariable String username, @RequestParam(value="since",required = false) Long createdDate) {
+        log.trace("GET | /getAll/{}/?since={}",username,createdDate);
+        try {
+            ResponseEntity<MessageResponse> entity = restTemplate.postForEntity(getUri("message-dao","/getAll"+(createdDate!=null?"?since="+createdDate:"")),new HttpEntity<>(Message.builder().author(username).build().toRequestString(),httpHeaders), MessageResponse.class);
+            return new ResponseEntity<>(entity.getBody().getPayload(),entity.getStatusCode());
+        }
+        catch (Exception e) {
+            log.trace("ERROR",e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 

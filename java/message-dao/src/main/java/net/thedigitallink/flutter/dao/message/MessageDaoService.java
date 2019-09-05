@@ -39,6 +39,9 @@ public class MessageDaoService {
     @RequestMapping(value = "/get", method= RequestMethod.POST)
     public Response<Message> get(@RequestBody Request<Message> request) {
         log.trace("POST | /get | {}",request.toString());
+        if(request.getPayload().getId()==null) {
+            return new Response<>(null, Response.Status.ERROR);
+        }
         return new Response<>(casquatchDao.getById(Message.class,request.getPayload(),request.getQueryOptions()));
     }
 

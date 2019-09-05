@@ -109,33 +109,31 @@ public class TimelineServiceController {
                         lastUpdate=System.currentTimeMillis()-(1*24*60*60*1000);
                 }
 
-                List<Message> messages =
-                        restTemplate.postForEntity(
-                            getUri("message-dao", String.format("/getAll?since=%s",lastUpdate)),
-                                new HttpEntity<>(
-                                    Message.builder()
-                                        .author(user)
-                                    .build().toRequestString()
-                                    ,httpHeaders
-                                ),
-                            MessageResponse.class
-                        ).getBody().getPayload();
+                List<Message> messages = restTemplate.exchange(
+                        getUri("message-service", String.format("/getAll/%s?since=%s",user,lastUpdate)),
+                        HttpMethod.GET,
+                        null,
+                        new ParameterizedTypeReference<List<Message>>(){}
+                        )
+                        .getBody();
 
-                for(Message message : messages) {
-                    restTemplate.postForEntity(
-                        getUri("timeline-dao", "/save"),
-                        new HttpEntity<>(
-                            Timeline.builder()
-                                .user(username)
-                                .author(message.getAuthor())
-                                .messageId(message.getId())
-                                .message(message.getMessage())
-                                .createdDttm(message.getCreatedDttm()
-                                ).build().toRequestString()
-                                ,httpHeaders
-                            ),
-                        TimelineResponse.class
-                    );
+                if(messages!=null && ! messages.isEmpty()) {
+                    for (Message message : messages) {
+                        restTemplate.postForEntity(
+                                getUri("timeline-dao", "/save"),
+                                new HttpEntity<>(
+                                        Timeline.builder()
+                                                .user(username)
+                                                .author(message.getAuthor())
+                                                .messageId(message.getId())
+                                                .message(message.getMessage())
+                                                .createdDttm(message.getCreatedDttm()
+                                                ).build().toRequestString()
+                                        , httpHeaders
+                                ),
+                                TimelineResponse.class
+                        );
+                    }
                 }
             }
             return new ResponseEntity<>(HttpStatus.OK);
