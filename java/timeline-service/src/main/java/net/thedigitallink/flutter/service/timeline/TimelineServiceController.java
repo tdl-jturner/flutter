@@ -17,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @RestController
@@ -59,7 +60,9 @@ public class TimelineServiceController {
                     TimelineResponse.class
                 );
 
-            return new ResponseEntity<>(entity.getBody().getPayload(),entity.getStatusCode());
+            List<Timeline> timeline = entity.getBody().getPayload();
+            timeline.sort(Comparator.comparing(Timeline::getCreatedDttm).reversed());
+            return new ResponseEntity<>(timeline,entity.getStatusCode());
         }
         catch (Exception e) {
             log.trace("ERROR",e);
