@@ -12,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.util.Collections;
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -53,9 +54,22 @@ public class UserServiceController {
     public ResponseEntity<User> getUser(@PathVariable String username) {
         log.trace("GET | /get/{}",username);
         try {
-            log.info("Received /get/{}",username);
             ResponseEntity<UserResponse> entity = restTemplate.postForEntity(getUri("user-dao","/get"),new HttpEntity<>(User.builder().username(username).build().toRequestString(),httpHeaders), UserResponse.class);
             return new ResponseEntity<>((User) entity.getBody().getPayload().get(0),entity.getStatusCode());
+        }
+        catch (Exception e) {
+            log.error("Exception Found",e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
+    @RequestMapping(value = "/getAll", method=RequestMethod.GET)
+    public ResponseEntity<List<User>> getAllUsers() {
+        log.trace("GET | /getAll");
+        try {
+            ResponseEntity<UserResponse> entity = restTemplate.postForEntity(getUri("user-dao","/getAll"),new HttpEntity<>((new User()).toRequestString(),httpHeaders), UserResponse.class);
+            return new ResponseEntity<>(entity.getBody().getPayload(),entity.getStatusCode());
         }
         catch (Exception e) {
             log.error("Exception Found",e);

@@ -26,4 +26,9 @@ public class UserDaoService {
         log.trace("POST | /get | {}",request.toString());
         return new Response<>(casquatchDao.getById(User.class,request.getPayload(),request.getQueryOptions()));
     }
+    @RequestMapping(value = "/getAll", method= RequestMethod.POST)
+    public Response<User> getAll(@RequestBody Request<User> request) {
+        log.trace("POST | /getAll | {}",request.toString());
+        return new Response<>(casquatchDao.getAllById(User.class,request.getPayload(),request.getQueryOptions()));
+    }
 }

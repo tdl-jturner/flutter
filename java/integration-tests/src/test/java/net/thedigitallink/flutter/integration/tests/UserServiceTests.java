@@ -10,17 +10,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -58,6 +58,17 @@ public class UserServiceTests {
         ResponseEntity<User> entity = restTemplate.getForEntity(getUri("user-service","/get")+"/"+user.getUsername().toString(),User.class);
         assert(entity.getStatusCode().is2xxSuccessful());
         Assert.assertEquals(entity.getBody().getUsername(),user.getUsername());
+    }
+
+    @Test
+    public void testGetAll() {
+        List<User> userList = new ArrayList<>();
+        for(int i = 0;i<5;i++) {
+            userList.add(random());
+        }
+        ResponseEntity<List<User>>  entity = restTemplate.exchange( getUri("user-service", "/getAll"), HttpMethod.GET,null, new ParameterizedTypeReference<List<User>>(){});
+        assert(entity.getStatusCode().is2xxSuccessful());
+        assert(entity.getBody().size()>=5);
     }
 
     @Test

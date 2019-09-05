@@ -20,7 +20,9 @@ import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -60,6 +62,17 @@ public class UserDaoTests {
         ResponseEntity<UserResponse> entity = restTemplate.postForEntity(getUri("user-dao","/get"),new HttpEntity<>(user.toRequestString(),httpHeaders), UserResponse.class);
         assert(entity.getStatusCode().is2xxSuccessful());
         assertEquals(user.getUsername(), entity.getBody().getPayload().get(0).getUsername());
+    }
+
+    @Test
+    public void testGetAll() {
+        List<User> userList = new ArrayList<>();
+        for(int i = 0;i<5;i++) {
+            userList.add(random());
+        }
+        ResponseEntity<UserResponse> entity = restTemplate.postForEntity(getUri("user-dao","/getAll"),new HttpEntity<>((new User()).toRequestString(),httpHeaders), UserResponse.class);
+        assert(entity.getStatusCode().is2xxSuccessful());
+        assert(entity.getBody().getPayload().size()>=5);
     }
 
     @Test
