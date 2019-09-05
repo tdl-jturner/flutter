@@ -15,6 +15,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -72,10 +73,23 @@ public class TimelineServiceController {
         log.trace("GET | /refresh/{}",username);
         try {
 
-            List<Follow> followList = restTemplate.exchange( getUri("follow-service", String.format("/get/%s",username)), HttpMethod.GET,null, new ParameterizedTypeReference<List<Follow>>(){}).getBody();
+            List<String> users = new ArrayList<>();
+            List<Follow> follows = restTemplate.exchange(
+                getUri("follow-service", String.format("/get/%s",username)),
+                HttpMethod.GET,
+    null,
+                new ParameterizedTypeReference<List<Follow>>(){}
+                )
+                .getBody()
+                ;
 
-            for(Follow follow : followList) {
-                log.trace("Getting lastUpdate for {}",follow.getAuthor());
+            if(follows!=null && !follows.isEmpty()) {
+                follows.forEach(f -> users.add(f.getAuthor()));
+            }
+
+            users.add(username);
+
+            for(String user : users) {
 
                 Long lastUpdate = null;
                 try {
@@ -84,8 +98,8 @@ public class TimelineServiceController {
                             new HttpEntity<>(
                                     Timeline.builder()
                                             .user(username)
-                                            .author(follow.getAuthor()
-                                            ).build().toRequestString()
+                                            .author(user)
+                                            .build().toRequestString()
                                     , httpHeaders
                             ),
                             TimelineResponse.class
@@ -97,11 +111,11 @@ public class TimelineServiceController {
 
                 List<Message> messages =
                         restTemplate.postForEntity(
-                            getUri("message-dao", String.format("/get?since=%s",lastUpdate)),
+                            getUri("message-dao", String.format("/getAll?since=%s",lastUpdate)),
                                 new HttpEntity<>(
                                     Message.builder()
-                                        .author(follow.getAuthor()
-                                    ).build().toRequestString()
+                                        .author(user)
+                                    .build().toRequestString()
                                     ,httpHeaders
                                 ),
                             MessageResponse.class
@@ -113,8 +127,9 @@ public class TimelineServiceController {
                         new HttpEntity<>(
                             Timeline.builder()
                                 .user(username)
-                                .author(follow.getAuthor())
-                                .message(message.getId())
+                                .author(message.getAuthor())
+                                .messageId(message.getId())
+                                .message(message.getMessage())
                                 .createdDttm(message.getCreatedDttm()
                                 ).build().toRequestString()
                                 ,httpHeaders
