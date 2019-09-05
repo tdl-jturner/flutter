@@ -43,7 +43,8 @@ CREATE TABLE flutter.timeline (
     user text,
     author text,
     created_dttm bigint,
-    message uuid,
+    message_id uuid,
+    message text,
    PRIMARY KEY (user,author,created_dttm)
 );
 EOF

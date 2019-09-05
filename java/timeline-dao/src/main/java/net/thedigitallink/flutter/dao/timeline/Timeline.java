@@ -20,7 +20,8 @@ public class Timeline extends AbstractCasquatchEntity {
     private String author;
     @ClusteringColumn(2)
     private Long createdDttm;
-    private UUID message;
+    private UUID messageId;
+    private String message;
 }
 
 

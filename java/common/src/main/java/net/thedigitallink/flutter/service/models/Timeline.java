@@ -14,5 +14,6 @@ public class Timeline extends AbstractEntity{
     private String user;
     private String author;
     private Long createdDttm=new Date().getTime();;
-    private UUID message;
+    private UUID messageId;
+    private String message;
 }
