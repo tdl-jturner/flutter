@@ -55,9 +55,9 @@ public class UserServiceTests {
     @Test
     public void testGet() {
         User user = random();
-        ResponseEntity<User> entity = restTemplate.getForEntity(getUri("user-service","/get")+"/"+user.getId().toString(),User.class);
+        ResponseEntity<User> entity = restTemplate.getForEntity(getUri("user-service","/get")+"/"+user.getUsername().toString(),User.class);
         assert(entity.getStatusCode().is2xxSuccessful());
-        Assert.assertEquals(entity.getBody().getId(),user.getId());
+        Assert.assertEquals(entity.getBody().getUsername(),user.getUsername());
     }
 
     @Test

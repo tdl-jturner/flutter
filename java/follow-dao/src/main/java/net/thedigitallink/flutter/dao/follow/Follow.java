@@ -7,14 +7,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.UUID;
-
 @CasquatchEntity
 @Getter @Setter @NoArgsConstructor
 public class Follow extends AbstractCasquatchEntity {
     @PartitionKey
-    private UUID follower;
-    private UUID author;
+    private String follower;
+    private String author;
 }
 
 

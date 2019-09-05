@@ -7,13 +7,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.UUID;
-
 @CasquatchEntity
 @Getter @Setter @NoArgsConstructor
 public class User extends AbstractCasquatchEntity {
     @PartitionKey
-    private UUID id;
     private String username;
     private String email;
     private Boolean enableNotifications;

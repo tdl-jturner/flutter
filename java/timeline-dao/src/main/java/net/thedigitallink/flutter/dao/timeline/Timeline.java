@@ -15,9 +15,9 @@ import java.util.UUID;
 @Builder
 public class Timeline extends AbstractCasquatchEntity {
     @PartitionKey
-    private UUID user;
+    private String user;
     @ClusteringColumn(1)
-    private UUID author;
+    private String author;
     @ClusteringColumn(2)
     private Long createdDttm;
     private UUID message;

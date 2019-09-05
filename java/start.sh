@@ -10,30 +10,29 @@ docker exec -i flutter cqlsh <<EOF
 CREATE KEYSPACE flutter WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'}  AND durable_writes = true;
 
 CREATE TABLE flutter.user (
-    id uuid,
     username text,
     email text,
     enable_notifications boolean,
     created_dttm bigint,
-   PRIMARY KEY (id)
+   PRIMARY KEY (username)
 );
 
 CREATE TABLE flutter.follow (
-    follower uuid,
-    author uuid,
+    follower text,
+    author text,
    PRIMARY KEY (follower,author)
 );
 
 CREATE TABLE flutter.message (
     id uuid,
-    author uuid,
+    author text,
     message text,
     created_dttm bigint,
    PRIMARY KEY (id)
 );
 
 CREATE TABLE flutter.message_by_author (
-    author uuid,
+    author text,
     created_dttm bigint,
     id uuid,
     message text,
@@ -41,8 +40,8 @@ CREATE TABLE flutter.message_by_author (
 );
 
 CREATE TABLE flutter.timeline (
-    user uuid,
-    author uuid,
+    user text,
+    author text,
     created_dttm bigint,
     message uuid,
    PRIMARY KEY (user,author,created_dttm)

@@ -1,9 +1,7 @@
 package net.thedigitallink.flutter.dao.timeline;
 
-import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.BoundStatement;
 import com.datastax.oss.driver.api.core.cql.BoundStatementBuilder;
-import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.select.Select;
 import com.netflix.discovery.EurekaClient;
@@ -12,13 +10,9 @@ import com.tmobile.opensource.casquatch.rest.Request;
 import com.tmobile.opensource.casquatch.rest.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import static com.datastax.oss.driver.api.querybuilder.QueryBuilder.bindMarker;
 

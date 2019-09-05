@@ -1,10 +1,8 @@
 package net.thedigitallink.flutter.service.models;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.*;
 
-import java.io.IOException;
+import java.util.Date;
 import java.util.UUID;
 
 @Getter
@@ -13,8 +11,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Timeline extends AbstractEntity{
-    private UUID user;
-    private UUID author;
-    private Long createdDttm;
+    private String user;
+    private String author;
+    private Long createdDttm=new Date().getTime();;
     private UUID message;
 }

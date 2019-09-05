@@ -17,7 +17,6 @@ import org.springframework.web.client.RestTemplate;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @Slf4j
@@ -41,19 +40,19 @@ public class TimelineServiceController {
         return URI.create(String.format("http://%s:%s/%s%s",instanceInfo.getIPAddr(),instanceInfo.getPort(),service.toLowerCase(),api));
     }
 
-    @RequestMapping(value = "/get/{id}", method=RequestMethod.GET)
-    public ResponseEntity<List<Timeline>> getTimeline(@PathVariable String id) {
-        log.trace("GET | /get/{}",id);
+    @RequestMapping(value = "/get/{username}", method=RequestMethod.GET)
+    public ResponseEntity<List<Timeline>> getTimeline(@PathVariable String username) {
+        log.trace("GET | /get/{}",username);
         try {
-            refreshTimeline(id);
+            refreshTimeline(username);
 
             ResponseEntity<TimelineResponse> entity =
                 restTemplate.postForEntity(
                     getUri("timeline-dao", "/get"),
                     new HttpEntity<>(
                         Timeline.builder()
-                                .user(UUID.fromString(id)
-                                ).build().toRequestString()
+                                .user(username)
+                                .build().toRequestString()
                         ,httpHeaders
                     ),
                     TimelineResponse.class
@@ -68,12 +67,12 @@ public class TimelineServiceController {
 
     }
 
-    @RequestMapping(value = "/refresh/{id}", method=RequestMethod.GET)
-    public ResponseEntity<Void> refreshTimeline(@PathVariable String id) {
-        log.trace("GET | /refresh/{}",id);
+    @RequestMapping(value = "/refresh/{username}", method=RequestMethod.GET)
+    public ResponseEntity<Void> refreshTimeline(@PathVariable String username) {
+        log.trace("GET | /refresh/{}",username);
         try {
 
-            List<Follow> followList = restTemplate.exchange( getUri("follow-service", String.format("/get/%s",id)), HttpMethod.GET,null, new ParameterizedTypeReference<List<Follow>>(){}).getBody();
+            List<Follow> followList = restTemplate.exchange( getUri("follow-service", String.format("/get/%s",username)), HttpMethod.GET,null, new ParameterizedTypeReference<List<Follow>>(){}).getBody();
 
             for(Follow follow : followList) {
                 log.trace("Getting lastUpdate for {}",follow.getAuthor());
@@ -84,7 +83,7 @@ public class TimelineServiceController {
                             getUri("timeline-dao", "/getOne"),
                             new HttpEntity<>(
                                     Timeline.builder()
-                                            .user(UUID.fromString(id))
+                                            .user(username)
                                             .author(follow.getAuthor()
                                             ).build().toRequestString()
                                     , httpHeaders
@@ -113,7 +112,7 @@ public class TimelineServiceController {
                         getUri("timeline-dao", "/save"),
                         new HttpEntity<>(
                             Timeline.builder()
-                                .user(UUID.fromString(id))
+                                .user(username)
                                 .author(follow.getAuthor())
                                 .message(message.getId())
                                 .createdDttm(message.getCreatedDttm()

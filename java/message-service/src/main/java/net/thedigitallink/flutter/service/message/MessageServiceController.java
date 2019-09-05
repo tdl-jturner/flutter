@@ -54,8 +54,7 @@ public class MessageServiceController {
         log.trace("GET | /get/{}",id);
         try {
             ResponseEntity<MessageResponse> entity = restTemplate.postForEntity(getUri("message-dao","/get"),new HttpEntity<>(Message.builder().id(UUID.fromString(id)).build().toRequestString(),httpHeaders), MessageResponse.class);
-            //TODO
-            return new ResponseEntity<>((Message) entity.getBody().getPayload().get(0),entity.getStatusCode());
+            return new ResponseEntity<>(entity.getBody().getPayload().get(0),entity.getStatusCode());
         }
         catch (Exception e) {
             log.trace("ERROR",e);

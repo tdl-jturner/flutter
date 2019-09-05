@@ -12,7 +12,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.util.Collections;
-import java.util.UUID;
 
 @RestController
 @Slf4j
@@ -50,12 +49,12 @@ public class UserServiceController {
         }
     }
 
-    @RequestMapping(value = "/get/{id}", method=RequestMethod.GET)
-    public ResponseEntity<User> getUser(@PathVariable String id) {
-        log.trace("GET | /get/{}",id);
+    @RequestMapping(value = "/get/{username}", method=RequestMethod.GET)
+    public ResponseEntity<User> getUser(@PathVariable String username) {
+        log.trace("GET | /get/{}",username);
         try {
-            log.info("Received /get/{}",id);
-            ResponseEntity<UserResponse> entity = restTemplate.postForEntity(getUri("user-dao","/get"),new HttpEntity<>(User.builder().id(UUID.fromString(id)).build().toRequestString(),httpHeaders), UserResponse.class);
+            log.info("Received /get/{}",username);
+            ResponseEntity<UserResponse> entity = restTemplate.postForEntity(getUri("user-dao","/get"),new HttpEntity<>(User.builder().username(username).build().toRequestString(),httpHeaders), UserResponse.class);
             return new ResponseEntity<>((User) entity.getBody().getPayload().get(0),entity.getStatusCode());
         }
         catch (Exception e) {

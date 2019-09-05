@@ -14,7 +14,7 @@ import java.util.UUID;
 public class Message extends AbstractCasquatchEntity {
     @PartitionKey
     private UUID id;
-    private UUID author;
+    private String author;
     private String message;
     private Long createdDttm;
 }

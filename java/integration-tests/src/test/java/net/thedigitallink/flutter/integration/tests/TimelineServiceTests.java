@@ -5,7 +5,6 @@ import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
 import lombok.extern.slf4j.Slf4j;
 import net.thedigitallink.flutter.service.models.*;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,15 +65,15 @@ public class TimelineServiceTests {
             users.add(random(User.class));
         }
         for(User user : users) {
-            save(Follow.class, Follow.builder().author(user.getId()).follower(mainUser.getId()).build());
+            save(Follow.class, Follow.builder().author(user.getUsername()).follower(mainUser.getUsername()).build());
             for(int i=0;i<5;i++) {
                 Message message = podamFactory.manufacturePojoWithFullData(Message.class);
-                message.setAuthor(user.getId());
+                message.setAuthor(user.getUsername());
                 save(Message.class,message);
             }
         }
 
-        ResponseEntity<List<Timeline>>  entity = restTemplate.exchange( getUri("timeline-service", String.format("/get/%s",mainUser.getId())), HttpMethod.GET,null, new ParameterizedTypeReference<List<Timeline>>(){});
+        ResponseEntity<List<Timeline>>  entity = restTemplate.exchange( getUri("timeline-service", String.format("/get/%s",mainUser.getUsername())), HttpMethod.GET,null, new ParameterizedTypeReference<List<Timeline>>(){});
         assert(entity.getStatusCode().is2xxSuccessful());
         assertEquals(entity.getBody().size(),5);
     }

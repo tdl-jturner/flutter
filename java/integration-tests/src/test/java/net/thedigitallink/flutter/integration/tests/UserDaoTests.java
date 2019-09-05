@@ -59,7 +59,7 @@ public class UserDaoTests {
         User user = random();
         ResponseEntity<UserResponse> entity = restTemplate.postForEntity(getUri("user-dao","/get"),new HttpEntity<>(user.toRequestString(),httpHeaders), UserResponse.class);
         assert(entity.getStatusCode().is2xxSuccessful());
-        assertEquals(user.getId(), entity.getBody().getPayload().get(0).getId());
+        assertEquals(user.getUsername(), entity.getBody().getPayload().get(0).getUsername());
     }
 
     @Test

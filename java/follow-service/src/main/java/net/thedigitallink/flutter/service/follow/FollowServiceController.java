@@ -13,7 +13,6 @@ import org.springframework.web.client.RestTemplate;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @Slf4j
@@ -50,11 +49,11 @@ public class FollowServiceController {
         }
     }
 
-    @RequestMapping(value = "/get/{id}", method=RequestMethod.GET)
-    public ResponseEntity<List<Follow>> getFollow(@PathVariable String id) {
-        log.trace("GET | /get/{}",id);
+    @RequestMapping(value = "/get/{username}", method=RequestMethod.GET)
+    public ResponseEntity<List<Follow>> getFollow(@PathVariable String username) {
+        log.trace("GET | /get/{}",username);
         try {
-            ResponseEntity<FollowResponse> entity = restTemplate.postForEntity(getUri("follow-dao","/getAll"),new HttpEntity<>(Follow.builder().follower(UUID.fromString(id)).build().toRequestString(),httpHeaders), FollowResponse.class);
+            ResponseEntity<FollowResponse> entity = restTemplate.postForEntity(getUri("follow-dao","/getAll"),new HttpEntity<>(Follow.builder().follower(username).build().toRequestString(),httpHeaders), FollowResponse.class);
             return new ResponseEntity<>(entity.getBody().getPayload(),entity.getStatusCode());
         }
         catch (Exception e) {
