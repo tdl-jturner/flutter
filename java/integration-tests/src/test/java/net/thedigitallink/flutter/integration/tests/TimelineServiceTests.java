@@ -75,14 +75,7 @@ public class TimelineServiceTests {
 
         ResponseEntity<List<Timeline>>  entity = restTemplate.exchange( getUri("timeline-service", String.format("/get/%s",mainUser.getUsername())), HttpMethod.GET,null, new ParameterizedTypeReference<List<Timeline>>(){});
         assert(entity.getStatusCode().is2xxSuccessful());
-        assertEquals(entity.getBody().size(),5);
-    }
-
-    @Test
-    public void testCreate() {
-        User user = random(User.class);
-        ResponseEntity<Void> entity = restTemplate.postForEntity(getUri("user-service","/create"),new HttpEntity<>(user,httpHeaders),Void.class);
-        assert(entity.getStatusCode().is2xxSuccessful());
+        assert(entity.getBody().size()>=5);
     }
 
 }
