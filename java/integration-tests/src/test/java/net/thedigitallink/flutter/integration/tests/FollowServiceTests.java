@@ -21,6 +21,9 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @Slf4j
@@ -64,6 +67,22 @@ public class FollowServiceTests {
         Follow follow = random();
         ResponseEntity<Void> entity = restTemplate.postForEntity(getUri("follow-service","/create"),new HttpEntity<>(follow,httpHeaders),Void.class);
         assert(entity.getStatusCode().is2xxSuccessful());
+    }
+
+    @Test
+    public void testExists() {
+        Follow follow = random();
+        ResponseEntity<Boolean> entity = restTemplate.postForEntity(getUri("follow-service","/exists"),new HttpEntity<>(follow,httpHeaders),Boolean.class);
+        assert(entity.getStatusCode().is2xxSuccessful());
+        assertTrue(entity.getBody());
+    }
+
+    @Test
+    public void testNotExists() {
+        Follow follow = podamFactory.manufacturePojoWithFullData(Follow.class);
+        ResponseEntity<Boolean> entity = restTemplate.postForEntity(getUri("follow-service","/exists"),new HttpEntity<>(follow,httpHeaders),Boolean.class);
+        assert(entity.getStatusCode().is2xxSuccessful());
+        assertFalse(entity.getBody());
     }
 
 }

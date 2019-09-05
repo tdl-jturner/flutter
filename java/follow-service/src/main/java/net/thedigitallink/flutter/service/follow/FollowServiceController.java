@@ -60,6 +60,24 @@ public class FollowServiceController {
             log.trace("ERROR",e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @RequestMapping(value = "/exists", method= RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Boolean> exists(@RequestBody Follow request) {
+        log.trace("POST | /exists | {}",request.toString());
+        try {
+            ResponseEntity<FollowResponse> entity = restTemplate.postForEntity(getUri("follow-dao","/get"),new HttpEntity<>(request.toRequestString(),httpHeaders), FollowResponse.class);
+            if(entity.getStatusCode()==HttpStatus.OK && entity.getBody().getPayload()!= null && entity.getBody().getPayload().size()>0) {
+                return new ResponseEntity<>(true,entity.getStatusCode());
+            }
+            else {
+                return new ResponseEntity<>(false,entity.getStatusCode());
+            }
+        }
+        catch (Exception e) {
+            log.trace("ERROR",e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
     }
 
