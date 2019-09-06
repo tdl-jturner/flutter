@@ -4,6 +4,8 @@ package net.thedigitallink.flutter.integration.tests;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
 import lombok.extern.slf4j.Slf4j;
+import net.thedigitallink.flutter.service.models.Follow;
+import net.thedigitallink.flutter.service.models.FollowResponse;
 import net.thedigitallink.flutter.service.models.Timeline;
 import net.thedigitallink.flutter.service.models.TimelineResponse;
 import org.junit.Test;
@@ -22,7 +24,7 @@ import uk.co.jemos.podam.api.PodamFactoryImpl;
 import java.net.URI;
 import java.util.Collections;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -75,6 +77,19 @@ public class TimelineDaoTests {
         Timeline timeline = random();
         ResponseEntity<TimelineResponse> entity = restTemplate.postForEntity(getUri("timeline-dao","/save"),new HttpEntity<>(timeline.toRequestString(),httpHeaders), TimelineResponse.class);
         assert (entity.getStatusCode().is2xxSuccessful());
+    }
+
+    @Test
+    public void testDelete() {
+        Timeline timeline = random();
+        ResponseEntity<TimelineResponse> checkEntityPre = restTemplate.postForEntity(getUri("timeline-dao","/get"),new HttpEntity<>(timeline.toRequestString(),httpHeaders), TimelineResponse.class);
+        assertNotNull(checkEntityPre.getBody().getPayload());
+
+        ResponseEntity<TimelineResponse> deleteEntity = restTemplate.postForEntity(getUri("timeline-dao","/delete"),new HttpEntity<>(timeline.toRequestString(),httpHeaders), TimelineResponse.class);
+        assert (deleteEntity.getStatusCode().is2xxSuccessful());
+
+        ResponseEntity<TimelineResponse> checkEntityPost = restTemplate.postForEntity(getUri("timeline-dao","/get"),new HttpEntity<>(timeline.toRequestString(),httpHeaders), TimelineResponse.class);
+        assertNull(checkEntityPost.getBody().getPayload());
     }
 
 }

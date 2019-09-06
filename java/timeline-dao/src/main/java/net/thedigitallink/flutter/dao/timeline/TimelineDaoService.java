@@ -64,5 +64,11 @@ public class TimelineDaoService {
         return new Response<>(casquatchDao.save(Timeline.class,request.getPayload(),request.getQueryOptions()));
     }
 
+    @RequestMapping(value = "/delete", method= RequestMethod.POST)
+    public Response<Void> delete(@RequestBody Request<Timeline> request) {
+        log.trace("POST | /delete | {}",request.toString());
+        return new Response<>(casquatchDao.delete(Timeline.class,request.getPayload(),request.getQueryOptions()));
+    }
+
 
 }
