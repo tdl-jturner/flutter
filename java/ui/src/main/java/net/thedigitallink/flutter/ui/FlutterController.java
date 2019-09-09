@@ -36,12 +36,26 @@ public class FlutterController extends BaseController {
         ResponseEntity<List<User>> userEntity = restTemplate.exchange( getUri("user-service", "/getAll"), HttpMethod.GET,null, new ParameterizedTypeReference<List<User>>(){});
 
         for(User user : userEntity.getBody()) {
-            log.error("Pulling counts for user {}",user.getUsername());
+            log.debug("Pulling counts for user {}",user.getUsername());
             Map<String,Integer> counts = new HashMap();
-            ResponseEntity<List<Message>> messageEntity = restTemplate.exchange( getUri("message-service", "/getAll/"+user.getUsername()), HttpMethod.GET,null, new ParameterizedTypeReference<List<Message>>(){});
-            ResponseEntity<List<Follow>> followEntity = restTemplate.exchange( getUri("follow-service", "/get/"+user.getUsername()), HttpMethod.GET,null, new ParameterizedTypeReference<List<Follow>>(){});
-            counts.put("messages",(messageEntity.getBody()==null?0:messageEntity.getBody().size()));
-            counts.put("follows",(followEntity.getBody()==null?0:followEntity.getBody().size()));
+            try {
+                ResponseEntity<List<Message>> messageEntity = restTemplate.exchange(getUri("message-service", "/getAll/" + user.getUsername()), HttpMethod.GET, null, new ParameterizedTypeReference<List<Message>>() {
+                });
+                counts.put("messages",messageEntity.getBody().size());
+            }
+            catch(Exception e) {
+                counts.put("messages",0);
+            }
+
+            try {
+                ResponseEntity<List<Follow>> followEntity = restTemplate.exchange(getUri("follow-service", "/get/" + user.getUsername()), HttpMethod.GET, null, new ParameterizedTypeReference<List<Follow>>() {
+                });
+                counts.put("follows",followEntity.getBody().size());
+            }
+            catch(Exception e) {
+                counts.put("follows",0);
+            }
+
             users.put(user.getUsername(),counts);
         }
 
