@@ -46,6 +46,7 @@
     <module>message-service</module>
     <module>timeline-service</module>
     <module>integration-tests</module>
+    <module>ui</module>
   </modules>
 
 </project>
