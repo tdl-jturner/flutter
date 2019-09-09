@@ -61,7 +61,9 @@ public class TimelineServiceController {
                 );
 
             List<Timeline> timeline = entity.getBody().getPayload();
-            timeline.sort(Comparator.comparing(Timeline::getCreatedDttm).reversed());
+            if(timeline!=null) {
+                timeline.sort(Comparator.comparing(Timeline::getCreatedDttm).reversed());
+            }
             return new ResponseEntity<>(timeline,entity.getStatusCode());
         }
         catch (Exception e) {
