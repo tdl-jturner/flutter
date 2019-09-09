@@ -47,6 +47,7 @@
     <module>timeline-service</module>
     <module>integration-tests</module>
     <module>ui</module>
+    <module>genload</module>
   </modules>
 
 </project>
