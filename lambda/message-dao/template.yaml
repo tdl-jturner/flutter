@@ -1,0 +1,84 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Flutter Message-Dao on AWS Lambda
+
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  MessagesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: "Messages"
+      AttributeDefinitions:
+        - AttributeName: "id"
+          AttributeType: "S"
+      ProvisionedThroughPut:
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+      KeySchema:
+        - AttributeName: "id"
+          KeyType: "HASH"
+  MessageDaoRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: "/"
+      Policies:
+        - PolicyName: LogRole
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:SaveLogEvents
+                Resource: "*"
+        - PolicyName: DynamoDBMessageRole
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:*
+                Resource: !GetAtt MessagesTable.Arn
+    DependsOn: MessagesTable
+  MessageDaoGetFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: get/
+      Handler: app.lambda_handler
+      Runtime: python3.7
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            Path: /message-dao
+            Method: get
+      Role: !GetAtt MessageDaoRole.Arn
+    DependsOn: MessageDaoRole
+  MessageDaoSaveFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: save/
+      Handler: app.lambda_handler
+      Runtime: python3.7
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            Path: /message-dao
+            Method: Save
+      Role: !GetAtt MessageDaoRole.Arn
+    DependsOn: MessageDaoRole
