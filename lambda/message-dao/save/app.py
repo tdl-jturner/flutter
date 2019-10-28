@@ -4,8 +4,53 @@ import datetime
 from boto3.dynamodb.conditions import Key, Attr
 from botocore.exceptions import ClientError
 
-def lambda_handler(event, context):
 
+def lambda_handler(event, context):
+    """Flutter: MessageDao->Save Handler
+
+        Parameters
+        ----------
+        event: dict, required
+            API Gateway Lambda Proxy Input Format
+
+            Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
+
+        context: object, required
+            Lambda Context runtime methods and attributes
+
+            Context doc: https://docs.aws.amazon.com/lambda/latest/dg/python-context-object.html
+
+        event['payload']['id'] uuid, optional
+            Message UUID, will be automatically created if missing
+
+        event['payload']['message'] uuid, required
+            Message content
+
+        event['payload']['author'] uuid, required
+            UUID of Message's author
+
+        event['payload']['createdDttm'] timestamp, required
+            CreateDTTM of message, will be set to current time if missing
+
+        Returns
+        ------
+        API Gateway Lambda Proxy Output Format: dict
+
+            Return doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
+
+        body['payload'] object, optional
+            Saved object
+
+        body['error'] string, optional
+            Error message if status code 500
+
+
+        Status Codes
+        ------
+        200: OK
+        404: No Data Found
+        500: Invalid request
+        """
     if not 'payload' in event:
         return {"StatusCode": 500,"body": "Payload not found"}
 
