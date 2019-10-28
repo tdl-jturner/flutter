@@ -26,7 +26,7 @@ def lambda_handler(event, context):
             return {
                 "statusCode": 500,
                 "body": {
-                    "error":e.respons['Error']
+                    "error": e.response['Error']
                 }
             }
         print(e.response['Error']['Message'])
