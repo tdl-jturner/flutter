@@ -15,12 +15,33 @@ Resources:
       AttributeDefinitions:
         - AttributeName: "id"
           AttributeType: "S"
-      ProvisionedThroughPut:
+        - AttributeName: "createdDttm"
+          AttributeType: "N"
+        - AttributeName: "author"
+          AttributeType: "S"
+      ProvisionedThroughput:
         ReadCapacityUnits: "5"
         WriteCapacityUnits: "5"
       KeySchema:
         - AttributeName: "id"
           KeyType: "HASH"
+      GlobalSecondaryIndexes:
+        - IndexName: MessagesByAuthorDateIndex
+          KeySchema:
+            -
+              AttributeName: "author"
+              KeyType: "HASH"
+            -
+              AttributeName: "createdDttm"
+              KeyType: "RANGE"
+          Projection:
+            NonKeyAttributes:
+              - "id"
+              - "message"
+            ProjectionType: "INCLUDE"
+          ProvisionedThroughput:
+            ReadCapacityUnits: "5"
+            WriteCapacityUnits: "5"
   MessageDaoRole:
     Type: AWS::IAM::Role
     Properties:
@@ -61,11 +82,25 @@ Resources:
       Handler: app.lambda_handler
       Runtime: python3.7
       Events:
-        HelloWorld:
+        Flutter:
           Type: Api
           Properties:
-            Path: /message-dao
-            Method: get
+            Path: /message-dao/get
+            Method: post
+      Role: !GetAtt MessageDaoRole.Arn
+    DependsOn: MessageDaoRole
+  MessageDaoGetAllFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: getall/
+      Handler: app.lambda_handler
+      Runtime: python3.7
+      Events:
+        Flutter:
+          Type: Api
+          Properties:
+            Path: /message-dao/getAll
+            Method: post
       Role: !GetAtt MessageDaoRole.Arn
     DependsOn: MessageDaoRole
   MessageDaoSaveFunction:
@@ -75,10 +110,10 @@ Resources:
       Handler: app.lambda_handler
       Runtime: python3.7
       Events:
-        HelloWorld:
+        Flutter:
           Type: Api
           Properties:
-            Path: /message-dao
-            Method: Save
+            Path: /message-dao/save
+            Method: post
       Role: !GetAtt MessageDaoRole.Arn
     DependsOn: MessageDaoRole
