@@ -41,7 +41,7 @@ def lambda_handler(event, context):
     500: Invalid request
     """
 
-    if not 'payload' in event:
+    if 'payload' not in event:
         return {
             "StatusCode": 500,
             "body": "Payload not found"

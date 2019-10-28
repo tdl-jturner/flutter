@@ -51,14 +51,23 @@ def lambda_handler(event, context):
         404: No Data Found
         500: Invalid request
         """
-    if not 'payload' in event:
-        return {"StatusCode": 500,"body": "Payload not found"}
+    if 'payload' not in event:
+        return {
+            "StatusCode": 500,
+            "body": "Payload not found"
+        }
 
-    if not 'author' in event['payload']:
-        return {"StatusCode": 500,"body": "Author not found"}
+    if 'author' not in event['payload']:
+        return {
+            "StatusCode": 500,
+            "body": "Author not found"
+        }
 
-    if not 'message' in event['payload']:
-        return {"StatusCode": 500,"body": "Message not found"}
+    if 'message' not in event['payload']:
+        return {
+            "StatusCode": 500,
+            "body": "Message not found"
+        }
 
     try:
         message = {

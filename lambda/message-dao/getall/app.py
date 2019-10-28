@@ -45,15 +45,21 @@ def lambda_handler(event, context):
     500: Invalid request
     """
 
-    if not 'payload' in event:
-        return {"StatusCode": 500,"body":"Payload not found"}
+    if 'payload' not in event:
+        return {
+            "StatusCode": 500,
+            "body": "Payload not found"
+        }
 
     try:
 
         table = boto3.resource('dynamodb').Table('Messages')
 
-        if not 'author' in event['payload']:
-            return {"StatusCode": 500,"body":"Author not found"}
+        if 'author' not in event['payload']:
+            return {
+                "StatusCode": 500,
+                "body": "Author not found"
+            }
 
         if 'since' in event:
             response = table.query(
