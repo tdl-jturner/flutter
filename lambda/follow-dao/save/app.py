@@ -76,7 +76,7 @@ def lambda_handler(event, context):
             "author": event['payload']['author'],
             "createdDttm": (event['payload']['createdDttm'] if 'createdDttm' in event['payload'] else int(datetime.datetime.utcnow().timestamp()))
         }
-        boto3.resource('dynamodb').Table('Message').put_item(Item=message)
+        boto3.resource('dynamodb').Table('Messages').put_item(Item=message)
     except ClientError as e:
         return {
             "statusCode": 500,

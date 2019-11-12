@@ -1,48 +1,42 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  Flutter Message-Dao on AWS Lambda
+  Flutter Follow-Dao on AWS Lambda
 
 Globals:
   Function:
     Timeout: 3
 
 Resources:
-  MessageTable:
+  FollowTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: "Message"
+      TableName: "Follow"
       AttributeDefinitions:
-        - AttributeName: "id"
+        - AttributeName: "follower"
           AttributeType: "S"
-        - AttributeName: "createdDttm"
-          AttributeType: "N"
         - AttributeName: "author"
           AttributeType: "S"
       ProvisionedThroughput:
         ReadCapacityUnits: "5"
         WriteCapacityUnits: "5"
       KeySchema:
-        - AttributeName: "id"
+        - AttributeName: "follower"
           KeyType: "HASH"
       GlobalSecondaryIndexes:
-        - IndexName: MessageByAuthorDateIndex
+        - IndexName: FollowByAuthorIndex
           KeySchema:
             -
               AttributeName: "author"
               KeyType: "HASH"
-            -
-              AttributeName: "createdDttm"
-              KeyType: "RANGE"
           Projection:
             NonKeyAttributes:
-              - "id"
-              - "message"
+              - "follower"
             ProjectionType: "INCLUDE"
           ProvisionedThroughput:
             ReadCapacityUnits: "5"
             WriteCapacityUnits: "5"
-   MessageDaoRole:
+  FollowDaoRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -66,30 +60,16 @@ Resources:
                   - logs:CreateLogStream
                   - logs:SaveLogEvents
                 Resource: "*"
-        - PolicyName: DynamoDBMessageRole
+        - PolicyName: DynamoDBFollowRole
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
               - Effect: Allow
                 Action:
                   - dynamodb:*
-                Resource: !GetAtt MessageTable.Arn
-    DependsOn: MessageTable
-  MessageDaoGetFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: get/
-      Handler: app.lambda_handler
-      Runtime: python3.7
-      Events:
-        Flutter:
-          Type: Api
-          Properties:
-            Path: /message-dao/get
-            Method: post
-      Role: !GetAtt MessageDaoRole.Arn
-    DependsOn: MessageDaoRole
-  MessageDaoGetAllFunction:
+                Resource: !GetAtt FollowTable.Arn
+    DependsOn: FollowTable
+  FollowDaoGetAllFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: getall/
@@ -99,11 +79,11 @@ Resources:
         Flutter:
           Type: Api
           Properties:
-            Path: /message-dao/getAll
+            Path: /follow-dao/getAll
             Method: post
-      Role: !GetAtt MessageDaoRole.Arn
-    DependsOn: MessageDaoRole
-  MessageDaoSaveFunction:
+      Role: !GetAtt FollowDaoRole.Arn
+    DependsOn: FollowDaoRole
+  FollowDaoSaveFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: save/
@@ -113,7 +93,7 @@ Resources:
         Flutter:
           Type: Api
           Properties:
-            Path: /message-dao/save
+            Path: /follow-dao/save
             Method: post
-      Role: !GetAtt MessageDaoRole.Arn
-    DependsOn: MessageDaoRole
+      Role: !GetAtt FollowDaoRole.Arn
+    DependsOn: FollowDaoRole

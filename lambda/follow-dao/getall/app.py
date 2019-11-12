@@ -4,7 +4,7 @@ from botocore.exceptions import ClientError
 
 
 def lambda_handler(event, context):
-    """Flutter: MessageDao->GetAll Handler
+    """Flutter: FollowDao->GetAll Handler
 
     Parameters
     ----------
@@ -18,11 +18,11 @@ def lambda_handler(event, context):
 
         Context doc: https://docs.aws.amazon.com/lambda/latest/dg/python-context-object.html
 
-    event['payload']['author'] string, required
+    event['payload']['follower'] string, optional
         Payload object containing author of message
 
-    event['since'] number, optional
-        Timestamp to return only data since this point
+    event['payload']['author'] string, optional
+        Payload object containing author of message
 
     Returns
     ------
@@ -53,25 +53,22 @@ def lambda_handler(event, context):
 
     try:
 
-        table = boto3.resource('dynamodb').Table('Message')
+        table = boto3.resource('dynamodb').Table('Follows')
 
-        if 'author' not in event['payload']:
-            return {
-                "StatusCode": 500,
-                "body": "Author not found"
-            }
-
-        if 'since' in event:
+        if 'follower' in event['payload']:
             response = table.query(
-                IndexName='MessageByAuthorDateIndex',
-                KeyConditionExpression=Key('author').eq(event['payload']['author']) &
-                                       Key('createdDttm').gte(event['since'])
+                KeyConditionExpression=Key('follower').eq(event['payload']['follower'])
             )
-        else:
+        elif 'author' in event['payload']:
             response = table.query(
-                IndexName='MessageByAuthorDateIndex',
+                IndexName='FollowByAuthor',
                 KeyConditionExpression=Key('author').eq(event['payload']['author'])
             )
+        else:
+            return {
+                "StatusCode": 500,
+                "body": "Follower or Author are required"
+            }
 
     except ClientError as e:
         if e.response['Error']['Code'] == "ResourceNotFoundException":

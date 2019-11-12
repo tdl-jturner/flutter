@@ -48,7 +48,7 @@ def lambda_handler(event, context):
         }
 
     try:
-        response = boto3.resource('dynamodb').Table('Messages').get_item(
+        response = boto3.resource('dynamodb').Table('Message').get_item(
             Key={
                 'id': event['payload']['id']
             }
